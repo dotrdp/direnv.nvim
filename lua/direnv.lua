@@ -49,6 +49,7 @@ end
 --- Get current working directory safely
 --- @return string|nil cwd Current working directory or nil on error
 M.get_cwd = function()
+   vim.notify("I work", vim.log.levels.ERROR)
    -- edge case since it already returns nil on error
    if M.config.oilnvim.enabled then
       return require("oil").get_current_dir()
