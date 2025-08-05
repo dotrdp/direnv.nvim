@@ -7,6 +7,7 @@ local M = {}
 --- @field statusline table Configuration for statusline integration
 --- @field statusline.enabled boolean Enable statusline integration
 --- @field statusline.icon string Icon to show in statusline
+--- @field oilnvim.enabled boolean Enable integration with oil.nvim
 --- @field keybindings table Keybindings configuration
 --- @field keybindings.allow string Keybinding to allow direnv
 --- @field keybindings.deny string Keybinding to deny direnv
@@ -46,7 +47,11 @@ end
 
 --- Get current working directory safely
 --- @return string|nil cwd Current working directory or nil on error
-local function get_cwd()
+M.get_cwd = function()
+   -- edge case since it already returns nil on error
+   if M.config.oilnvim.enabled then
+      return require("oil").get_current_dir()
+   end
    local cwd_result, err = vim.uv.cwd()
    if err then
       vim.schedule(function()
@@ -132,7 +137,7 @@ M._get_rc_status = function(callback)
 
    cache.pending_request = true
 
-   local cwd = get_cwd()
+   local cwd = M.get_cwd()
    if not cwd then
       cache.pending_request = false
       for _, cb in ipairs(pending_callbacks) do
@@ -271,7 +276,7 @@ M.allow_direnv = function()
       end)
 
       -- Capture dir before the async call
-      local cwd = get_cwd()
+      local cwd = M.get_cwd()
       if not cwd then
          return
       end
@@ -320,7 +325,7 @@ M.deny_direnv = function()
          notify("Denying direnv for " .. path, vim.log.levels.INFO)
       end)
 
-      local cwd = get_cwd()
+      local cwd = M.get_cwd()
       if not cwd then
          return
       end
@@ -355,7 +360,7 @@ M.edit_envrc = function()
       if not path then
          -- TODO: envrc can be in a different directory, e.g., the parent.
          -- We should search for it backwards eventually.
-         local cwd = get_cwd()
+         local cwd = M.get_cwd()
          if not cwd then
             return
          end
