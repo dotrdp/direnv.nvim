@@ -7,6 +7,7 @@ local M = {}
 --- @field statusline table Configuration for statusline integration
 --- @field statusline.enabled boolean Enable statusline integration
 --- @field statusline.icon string Icon to show in statusline
+--- @field oilnvim table Configuration for oil.nvim integration
 --- @field oilnvim.enabled boolean Enable integration with oil.nvim
 --- @field keybindings table Keybindings configuration
 --- @field keybindings.allow string Keybinding to allow direnv
@@ -457,6 +458,9 @@ M.setup = function(user_config)
       statusline = {
          enabled = false,
          icon = "󱚟",
+      },
+      oilnvim = {
+         enabled = false,
       },
       keybindings = {
          allow = "<Leader>da",
