@@ -48,10 +48,15 @@ end
 
 --- Get current working directory safely
 --- @return string|nil cwd Current working directory or nil on error
-local function get_cwd(conf)
+M.get_cwd = function()
    -- edge case since it already returns nil on error
-   if conf.oilnvim.enabled then
-      return require("oil").get_current_dir()
+   if M.config.oilnvim.enabled then
+      local res = require("oil").get_current_dir()
+      if res == nil then
+         return res
+      else
+         return res:sub(1, -1)
+      end
    end
    local cwd_result, err = vim.uv.cwd()
    if err then
@@ -138,7 +143,7 @@ M._get_rc_status = function(callback)
 
    cache.pending_request = true
 
-   local cwd = get_cwd(M.config)
+   local cwd = M.get_cwd()
    if not cwd then
       cache.pending_request = false
       for _, cb in ipairs(pending_callbacks) do
@@ -277,7 +282,7 @@ M.allow_direnv = function()
       end)
 
       -- Capture dir before the async call
-      local cwd = get_cwd(M.config)
+      local cwd = M.get_cwd()
       if not cwd then
          return
       end
@@ -326,7 +331,7 @@ M.deny_direnv = function()
          notify("Denying direnv for " .. path, vim.log.levels.INFO)
       end)
 
-      local cwd = get_cwd(M.config)
+      local cwd = M.get_cwd()
       if not cwd then
          return
       end
@@ -361,7 +366,7 @@ M.edit_envrc = function()
       if not path then
          -- TODO: envrc can be in a different directory, e.g., the parent.
          -- We should search for it backwards eventually.
-         local cwd = get_cwd(M.config)
+         local cwd = M.get_cwd()
          if not cwd then
             return
          end
