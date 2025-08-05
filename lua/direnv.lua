@@ -51,6 +51,13 @@ end
 M.get_cwd = function()
    -- edge case since it already returns nil on error
    if M.config.oilnvim.enabled then
+      if require("oil") == nil then
+         vim.notify(
+            "oil.nvim integration is enabled but oil.nvim is not installed",
+            vim.log.levels.ERROR
+         )
+         return nil
+      end
       return require("oil").get_current_dir()
    end
    local cwd_result, err = vim.uv.cwd()
