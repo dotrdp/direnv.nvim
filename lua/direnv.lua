@@ -50,17 +50,8 @@ end
 --- @return string|nil cwd Current working directory or nil on error
 local function get_cwd()
    -- edge case since it already returns nil on error
-   local cwd_result, err = vim.fn.expand("%:h")
-   if err then
-      vim.schedule(function()
-         vim.notify(
-            "Failed to get current directory: " .. err,
-            vim.log.levels.ERROR
-         )
-      end)
-      return nil
-   end
-   return cwd_result
+   local cwd_result = vim.fn.expand("%:h")
+   return vim.fn.getcwd()
 end
 
 --- Setup keymaps for the plugin
